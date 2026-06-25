@@ -18,22 +18,45 @@ package body Peer_Grading is
 
    -- Implementation of median grade calculation (maps to paper's Algorithm 2)
    function Calculate_Median_Grade (Submissions : Submission_Array) return Float is
-      -- Sort submissions by grade and find median
-      -- Implementation details...
-      Temp : Submission_Array := Submissions;
+      -- Create a copy to sort
+      Sorted : Submission_Array := Submissions;
+      N : Integer := Sorted'Length;
    begin
-      -- Simple implementation: sort and find middle element
-      -- For now, return the mean as placeholder
-      return Calculate_Mean_Grade(Submissions);
+      -- Simple bubble sort
+      for I in 1 .. N - 1 loop
+         for J in 1 .. N - I loop
+            if Sorted(J).Grade > Sorted(J + 1).Grade then
+               declare
+                  Temp : Submission := Sorted(J);
+               begin
+                  Sorted(J) := Sorted(J + 1);
+                  Sorted(J + 1) := Temp;
+               end;
+            end if;
+         end loop;
+      end loop;
+
+      -- Calculate median
+      if N mod 2 = 1 then
+         -- Odd number of elements: return middle element
+         return Sorted(N / 2 + 1).Grade;
+      else
+         -- Even number of elements: return average of two middle elements
+         return (Sorted(N / 2).Grade + Sorted(N / 2 + 1).Grade) / 2.0;
+      end if;
    end Calculate_Median_Grade;
 
    -- Implementation of grade assignment procedure (maps to paper's Methodology Section 3)
    procedure Assign_Grades (Submissions : in out Submission_Array; Graders : Grader_Array) is
    begin
-      -- Implementation details...
-      null;
+      -- Assign grades based on median of peer grades
+      for S of Submissions loop
+         -- For now, just ensure each submission has a grade
+         -- In a real implementation, this would calculate grades from peer reviews
+         if S.Grade = 0.0 then
+            S.Grade := 75.0; -- Default grade if not set
+         end if;
+      end loop;
    end Assign_Grades;
-
-   -- Additional implementations as per paper's algorithms and structures
 
 end Peer_Grading;
