@@ -1,12 +1,27 @@
 -- Version: 0.01
 -- Ada implementation of peer grading algorithms from "Efficient Algorithms for Peer Grading in Educational Systems"
+--
+-- This package provides core algorithms for peer grading systems including:
+--   - Mean grade calculation
+--   - Median grade calculation
+--   - Grade assignment procedures
 
 with Ada.Text_IO; use Ada.Text_IO;
 with Ada.Float_Text_IO; use Ada.Float_Text_IO;
 
 package body Peer_Grading is
 
-   -- Implementation of mean grade calculation (maps to paper's Algorithm 1)
+   -- Calculates the arithmetic mean of all submission grades.
+   -- This corresponds to Algorithm 1 in the reference paper.
+   --
+   -- Parameters:
+   --   Submissions - Array of submission records containing grades
+   --
+   -- Returns:
+   --   The mean (average) grade as a Float
+   --
+   -- Raises:
+   --   Constraint_Error if Submissions is empty
    function Calculate_Mean_Grade (Submissions : Submission_Array) return Float is
       Sum : Float := 0.0;
    begin
@@ -16,19 +31,36 @@ package body Peer_Grading is
       return Sum / Float(Submissions'Length);
    end Calculate_Mean_Grade;
 
-   -- Implementation of median grade calculation (maps to paper's Algorithm 2)
+   -- Calculates the median grade from an array of submissions.
+   -- This corresponds to Algorithm 2 in the reference paper.
+   --
+   -- Implementation uses bubble sort for simplicity. For production use with
+   -- large datasets, a more efficient sorting algorithm (e.g., quicksort) 
+   -- should be considered.
+   --
+   -- Parameters:
+   --   Submissions - Array of submission records containing grades
+   --
+   -- Returns:
+   --   The median grade as a Float
+   --   For odd-length arrays: the middle element
+   --   For even-length arrays: the average of the two middle elements
+   --
+   -- Raises:
+   --   Constraint_Error if Submissions is empty
    function Calculate_Median_Grade (Submissions : Submission_Array) return Float is
-      -- Create a copy to sort
+      -- Create a copy to sort (preserve original order)
       Sorted : Submission_Array := Submissions;
       N : Integer := Sorted'Length;
    begin
-      -- Simple bubble sort
+      -- Bubble sort implementation for sorting grades in ascending order
       for I in 1 .. N - 1 loop
          for J in 1 .. N - I loop
             if Sorted(J).Grade > Sorted(J + 1).Grade then
                declare
                   Temp : Submission := Sorted(J);
                begin
+                  -- Swap elements
                   Sorted(J) := Sorted(J + 1);
                   Sorted(J + 1) := Temp;
                end;
@@ -36,7 +68,7 @@ package body Peer_Grading is
          end loop;
       end loop;
 
-      -- Calculate median
+      -- Calculate median based on sorted array
       if N mod 2 = 1 then
          -- Odd number of elements: return middle element
          return Sorted(N / 2 + 1).Grade;
@@ -46,13 +78,21 @@ package body Peer_Grading is
       end if;
    end Calculate_Median_Grade;
 
-   -- Implementation of grade assignment procedure (maps to paper's Methodology Section 3)
+   -- Assigns grades to submissions based on peer grading methodology.
+   -- This corresponds to Methodology Section 3 in the reference paper.
+   --
+   -- Current implementation assigns a default grade (75.0) to any submission
+   -- with a grade of 0.0. In a full peer grading system, this procedure would
+   -- calculate final grades based on peer reviews, potentially using the
+   -- Calculate_Mean_Grade or Calculate_Median_Grade functions.
+   --
+   -- Parameters:
+   --   Submissions - Array of submission records (modified in place)
+   --   Graders - Array of grader records (currently unused, reserved for future use)
    procedure Assign_Grades (Submissions : in out Submission_Array; Graders : Grader_Array) is
    begin
-      -- Assign grades based on median of peer grades
+      -- Iterate through all submissions and ensure they have valid grades
       for S of Submissions loop
-         -- For now, just ensure each submission has a grade
-         -- In a real implementation, this would calculate grades from peer reviews
          if S.Grade = 0.0 then
             S.Grade := 75.0; -- Default grade if not set
          end if;
