@@ -1,0 +1,19 @@
+-- Version: 0.01
+project Peer_Grading_System is
+
+   -- Define source directories (root directory only)
+   for Source_Dirs use (".");
+
+   -- Specify the main Ada file (implementation)
+   for Main use ("peer_grading.adb");
+
+   -- Compiler and linker options can be added here if needed
+   package Compiler is
+      for Default_Switches ("Ada") use ("-g", "-O2");
+   end Compiler;
+
+   package Linker is
+      for Default_Switches ("Ada") use ("-g");
+   end Linker;
+
+end Peer_Grading_System;
